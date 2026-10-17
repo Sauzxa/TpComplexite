@@ -1,51 +1,57 @@
 #include <stdio.h>
 #include <stdlib.h>
- 
-int is_prime(int n) {
-    if (n < 2) return 0;
-    if (n == 2) return 1;
-    if (n % 2 == 0) return 0;
-    
-    for (int i = 3; i * i <= n; i += 2) {
-        if (n % i == 0) return 0;
+#include <time.h>
+
+int is_prime(unsigned long long number) {
+    if (number < 2) return 0;
+    if (number == 2) return 1;
+    if (number % 2 == 0) return 0;
+    for (unsigned long long i = 3; i <= number / i; i += 2) {
+        if (number % i == 0) return 0;
     }
     return 1;
 }
 
-
 int main(int argc, char **argv) {
-    if (argc < 2) {
-        printf("Usage: %s primes10.txt\n", argv[0]);
+    if (argc != 3) {
+        printf("Usage: %s <input-file> <output-file>\n", argv[0]);
         return 1;
     }
 
-    // Open file
-    FILE *file = fopen(argv[1], "r"); // mode read here 
-    if (file == NULL) {
-        printf("Error: Cannot open file %s\n", argv[1]);
+    FILE *input = fopen(argv[1], "r");
+    if (input == NULL) {
+        printf("Cannot open input file %s\n", argv[1]);
         return 1;
     }
 
-   
-    int primes[100];
-    int count = 0;
-    int number;
+    unsigned long long primes[100];
+    unsigned long long number;
+    unsigned long long count = 0;
+    srand((unsigned int)time(NULL));
 
-    // Read numbers from file and keep only primes in range [1000, 1000000]
-    while (count < 100 && fscanf(file, "%d", &number) == 1) {
+    while (fscanf(input, "%llu", &number) == 1) {
         if (number >= 1000 && number <= 1000000 && is_prime(number)) {
-            primes[count] = number;
             count++;
+            if (count <= 100) primes[count - 1] = number;
+            else {
+                unsigned long long index = (unsigned long long)rand() % count;
+                if (index < 100) primes[index] = number;
+            }
         }
     }
+    fclose(input);
 
-    fclose(file);
-
-    // Print all prime numbers ta3 array
-    printf("Found %d prime numbers in range [1000, 1000000]:\n", count);
-    for (int i = 0; i < count; i++) {
-        printf("%d\n", primes[i]);
+    if (count < 100) {
+        printf("Input contains only %llu eligible primes; 100 are required\n", count);
+        return 1;
     }
 
+    FILE *output = fopen(argv[2], "w");
+    if (output == NULL) {
+        printf("Cannot open output file %s\n", argv[2]);
+        return 1;
+    }
+    for (int i = 0; i < 100; i++) fprintf(output, "%llu\n", primes[i]);
+    fclose(output);
     return 0;
 }

@@ -1,77 +1,63 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 
-
-int is_prime(int n) {
-    if (n < 2) return 0;
-    if (n == 2) return 1;
-    if (n % 2 == 0) return 0;
-    
-    for (int i = 3; i * i <= n; i += 2) {
-        if (n % i == 0) return 0;
-    }
-    return 1;
-}
-
-
-int count_digits(int n) {
-    int count = 0;
-    while (n > 0) {
+int count_digits(unsigned long long number) {
+    int count = 1;
+    while (number >= 10) {
+        number /= 10;
         count++;
-        n /= 10;
     }
     return count;
 }
 
-
 int main(int argc, char **argv) {
-    if (argc < 2) {
-        printf("Usage: %s primes10.txt\n", argv[0]);
+    if (argc != 3) {
+        printf("Usage: %s <input-file> <output-file>\n", argv[0]);
         return 1;
     }
 
-    // Open file
-    FILE *file = fopen(argv[1], "r"); // mode read here 
-    if (file == NULL) {
-        printf("Error: Cannot open file %s\n", argv[1]);
+    FILE *input = fopen(argv[1], "r");
+    if (input == NULL) {
+        printf("Cannot open input file %s\n", argv[1]);
         return 1;
     }
 
-    // Array to store 10 primes for each digit count (3 to 9 digits)
-    int primes[70]; // 10 primes * 7 digit categories = 70
-    int digit_counts[7] = {0}; // counters for 3,4,5,6,7,8,9 digits
-    int total_count = 0;
-    int number;
+    unsigned long long numbers[7][10];
+    unsigned long long counts[7] = {0};
+    unsigned long long number;
+    srand((unsigned int)time(NULL));
 
-    // Read numbers and collect 10 premiers pour chaque digit length
-    while (total_count < 70 && fscanf(file, "%d", &number) == 1) {
-        if (is_prime(number)) {
-            int digits = count_digits(number);
-            if (digits >= 3 && digits <= 9) {
-                int index = digits - 3; // 3 digits -> index 0, 4 digits -> index 1, etc.
-                if (digit_counts[index] < 10) {
-                    primes[total_count] = number;
-                    digit_counts[index]++;
-                    total_count++;
-                }
+    while (fscanf(input, "%llu", &number) == 1) {
+        int digits = count_digits(number);
+        if (digits >= 3 && digits <= 9) {
+            int group = digits - 3;
+            counts[group]++;
+            if (counts[group] <= 10) numbers[group][counts[group] - 1] = number;
+            else {
+                unsigned long long index = (unsigned long long)rand() % counts[group];
+                if (index < 10) numbers[group][index] = number;
             }
         }
     }
+    fclose(input);
 
-    fclose(file);
-
-   
-    printf("Found %d prime numbers:\n", total_count);
-    int pos = 0;
-    for (int d = 3; d <= 9; d++) {
-        int index = d - 3;
-        if (digit_counts[index] > 0) {
-            printf("\n%d-digit primes (%d numbers):\n", d, digit_counts[index]);
-            for (int i = 0; i < digit_counts[index]; i++) {
-                printf("%d\n", primes[pos++]);
-            }
+    for (int group = 0; group < 7; group++) {
+        if (counts[group] < 10) {
+            printf("Input has only %llu values with %d digits; 10 are required\n",
+                   counts[group], group + 3);
+            return 1;
         }
     }
 
+    FILE *output = fopen(argv[2], "w");
+    if (output == NULL) {
+        printf("Cannot open output file %s\n", argv[2]);
+        return 1;
+    }
+    for (int group = 0; group < 7; group++) {
+        for (int i = 0; i < 10; i++) fprintf(output, "%llu\n", numbers[group][i]);
+    }
+    fclose(output);
     return 0;
 }

@@ -1,39 +1,38 @@
-# Guide d'Exécution :
+# Guide d’exécution du TP0
 
+## Compiler
 
-
-## Pour compiler les fichiers C :
-
-- Cliquez droit sur `compile.sh` et cliquez sur "Run Code"
-- Ou bien utilisez la commande : `bash compile.sh` (pour Linux), ou simplement `./compile.sh` (il faut être dans le répertoire parent)
-
-## Pour exécuter :
-
-Depuis le terminal (cmd, PowerShell, bash, shell n'importe lequel) :
+Depuis le dossier `Tp0/` :
 
 ```bash
-./dist/Random100 Docs/primes10.txt
-./dist/Random1000 Docs/primes10.txt
-./dist/Test-1 Docs/primes10.txt
-./dist/Test-2 Docs/primes10.txt
-./dist/Test-3 Docs/primes10.txt
+bash compile.sh
 ```
 
-## Structure des dossiers :
+Le script compile les sources de `src/` et place les exécutables dans `dist/`.
 
+## Générer les jeux de données
+
+Chaque commande reçoit le fichier d’entrée puis le fichier de sortie. Les fichiers d’entrée doivent contenir des nombres entiers séparés par des espaces ou des retours à la ligne. Ils seront ajoutés ultérieurement. Les sorties sont écrites une valeur par ligne dans `data/`.
+
+```bash
+./dist/Random100 input.txt data/Random100.txt
+./dist/Random1000 input.txt data/Random1000.txt
+./dist/Test-1 input.txt data/Test-1.txt
+./dist/Test-2 input.txt data/Test-2.txt
+./dist/Test-3 input.txt data/Test-3.txt
 ```
-TpComplexit-/
-└── Tp0/                    # Dossier parent contenant tout le TP0
-	├── src/                # Fichiers source C
-	│   ├── Random100.c
-	│   ├── Random1000.c
-	│   ├── Test-1.c
-	│   ├── Test-2.c
-	│   └── Test-3.c
-	├── Docs/               # Documentation et données
-	│   ├── primes10.txt    # Fichier de nombres premiers
-	│   └── TP 0 Creation de donnees de tests.pdf
-	├── dist/               # Exécutables compilés
-	├── compile.sh          # Script de compilation
-	└── GuideExecution.md   # Ce fichier
+
+Les programmes choisissent aléatoirement les valeurs admissibles. Ils échouent avec un message explicite si l’entrée est invalide ou ne contient pas assez de valeurs admissibles. Test-1 demande 100 nombres premiers de l’intervalle `[1000, 1000000]`. Test-2 demande 10 nombres de chacune des longueurs 3 à 9 chiffres. Test-3 demande 25 nombres de chacune des longueurs 3, 6, 9 et 12 chiffres.
+
+## Préparer le rendu
+
+L’archive collective doit contenir un dossier par jeu de données, réunissant son fichier source et le fichier de données généré :
+
+```text
+NomDuGroupe_TP0.zip
+├── Random100/  (source + Random100.txt)
+├── Random1000/ (source + Random1000.txt)
+├── Test-1/     (source + Test-1.txt)
+├── Test-2/     (source + Test-2.txt)
+└── Test-3/     (source + Test-3.txt)
 ```
